@@ -25,7 +25,7 @@ def get_dominant_colors(image, num_colors=5):
     pixels = image_rgb.reshape(-1, 3)
 
     # Terapkan K-Means clustering
-    kmeans = KMeans(n_clusters=num_colors, random_state=0, n_init=10) # n_init=10 disarankan untuk K-Means
+    kmeans = KMeans(n_clusters=num_colors, random_state=0, n_init=10)
     kmeans.fit(pixels)
 
     # Dapatkan pusat cluster (warna dominan)
@@ -48,7 +48,7 @@ st.set_page_config(
 )
 
 st.title("🎨 Color Picker dari Gambar")
-st.markdown("Unggah sebuah gambar dan kami akan mengekstrak 5 warna paling dominan untuk Anda! **Klik pada kotak warna untuk menyalin kodenya.**")
+st.markdown("Unggah sebuah gambar dan kami akan mengekstrak 5 warna paling dominan untuk Anda! **Klik pada tombol warna untuk menyalin kodenya.**")
 
 uploaded_file = st.file_uploader("Pilih sebuah gambar...", type=["jpg", "jpeg", "png", "webp"])
 
@@ -58,21 +58,24 @@ if uploaded_file is not None:
 
     # Konversi Streamlit FileUploader ke format yang bisa dibaca OpenCV/PIL
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
-    image = cv2.imdecode(file_bytes, 1) # Membaca gambar dalam format BGR (OpenCV default)
+    image = cv2.imdecode(file_bytes, 1)
 
     # Ekstrak warna dominan
     dominant_colors = get_dominant_colors(image, num_colors=5)
 
     st.subheader("Palet Warna Dominan:")
     
-    # JavaScript untuk menyalin ke clipboard
-    # Fungsi ini akan ditambahkan ke body HTML
+    # JavaScript untuk menyalin ke clipboard dan menampilkan notifikasi
     st.markdown("""
         <script>
-        function copyToClipboard(text) {
+        function copyToClipboard(text, elementId) {
             navigator.clipboard.writeText(text).then(function() {
-                // Opsional: Tampilkan notifikasi kecil
-                // alert('Copied to clipboard: ' + text);
+                const element = document.getElementById(elementId);
+                const originalText = element.innerHTML;
+                element.innerHTML = 'Copied!';
+                setTimeout(() => {
+                    element.innerHTML = originalText;
+                }, 1000); // Kembali ke teks asli setelah 1 detik
             }, function(err) {
                 console.error('Could not copy text: ', err);
             });
@@ -88,38 +91,47 @@ if uploaded_file is not None:
         hex_code = rgb_to_hex(color_rgb)
         rgb_code = f"RGB({color_rgb[0]}, {color_rgb[1]}, {color_rgb[2]})"
         
+        # ID unik untuk setiap elemen yang bisa disalin agar notifikasi berfungsi
+        hex_id = f"hex-code-{i}"
+        rgb_id = f"rgb-code-{i}"
+
         with cols[i]:
-            # Menggunakan onclick event pada div untuk memanggil fungsi JavaScript
-            # Pastikan teks yang disalin adalah kode Hex, karena itu yang paling umum.
             st.markdown(
                 f"""
-                <div 
+                <button 
                     style="
                         width: 100%;
-                        height: 100px;
+                        height: 120px; /* Sedikit lebih tinggi agar teks bisa masuk */
                         background-color: {hex_code};
+                        border: 2px solid {hex_code}; /* Border agar terlihat seperti tombol */
                         border-radius: 10px;
                         display: flex;
+                        flex-direction: column; /* Tata letak vertikal untuk teks */
                         justify-content: center;
                         align-items: center;
                         box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-                        cursor: pointer; /* Menambahkan pointer agar terlihat bisa diklik */
+                        cursor: pointer;
+                        transition: all 0.2s ease-in-out; /* Efek transisi untuk hover */
+                        color: {'#FFFFFF' if sum(color_rgb) < 382.5 else '#000000'}; /* Warna teks otomatis kontras */
+                        font-family: 'Arial', sans-serif;
+                        font-size: 1em;
+                        font-weight: bold;
+                        padding: 5px; /* Padding di dalam tombol */
                     "
-                    onclick="copyToClipboard('{hex_code}')" 
+                    onmouseover="this.style.transform='scale(1.03)'" /* Efek hover */
+                    onmouseout="this.style.transform='scale(1)'" /* Efek hover kembali */
+                    onclick="copyToClipboard('{hex_code}', '{hex_id}')"
                     title="Klik untuk menyalin kode Hex"
                 >
-                </div>
-                <p style="text-align: center; font-weight: bold; margin-top: 10px; cursor: pointer;" 
-                   onclick="copyToClipboard('{hex_code}')"
-                   title="Klik untuk menyalin kode Hex"
-                >{hex_code}</p>
-                <p style="text-align: center; font-size: 0.9em; cursor: pointer;" 
-                   onclick="copyToClipboard('{rgb_code}')"
-                   title="Klik untuk menyalin kode RGB"
-                >{rgb_code}</p>
+                    <span id="{hex_id}" style="margin-bottom: 5px;">{hex_code}</span>
+                    <span id="{rgb_id}" style="font-size: 0.8em; font-weight: normal;" 
+                          onclick="event.stopPropagation(); copyToClipboard('{rgb_code}', '{rgb_id}');"
+                          title="Klik untuk menyalin kode RGB"
+                    >{rgb_code}</span>
+                </button>
                 """, 
                 unsafe_allow_html=True
             )
 
     st.markdown("---")
-    st.write("Dibuat dengan Fizi.")
+    st.write("Dibuat dengan ❤️ dan Streamlit.")
