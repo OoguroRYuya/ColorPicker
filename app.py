@@ -99,32 +99,32 @@ if uploaded_file is not None:
             st.markdown(
                 f"""
                 <button 
-                    style="
+                    style='
                         width: 100%;
-                        height: 120px; /* Sedikit lebih tinggi agar teks bisa masuk */
+                        height: 120px;
                         background-color: {hex_code};
-                        border: 2px solid {hex_code}; /* Border agar terlihat seperti tombol */
+                        border: 2px solid {hex_code};
                         border-radius: 10px;
                         display: flex;
-                        flex-direction: column; /* Tata letak vertikal untuk teks */
+                        flex-direction: column;
                         justify-content: center;
                         align-items: center;
                         box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
                         cursor: pointer;
-                        transition: all 0.2s ease-in-out; /* Efek transisi untuk hover */
-                        color: {'#FFFFFF' if sum(color_rgb) < 382.5 else '#000000'}; /* Warna teks otomatis kontras */
-                        font-family: 'Arial', sans-serif;
+                        transition: all 0.2s ease-in-out;
+                        color: {'#FFFFFF' if sum(color_rgb) < 382.5 else '#000000'};
+                        font-family: "Arial", sans-serif;
                         font-size: 1em;
                         font-weight: bold;
-                        padding: 5px; /* Padding di dalam tombol */
-                    "
-                    onmouseover="this.style.transform='scale(1.03)'" /* Efek hover */
-                    onmouseout="this.style.transform='scale(1)'" /* Efek hover kembali */
+                        padding: 5px;
+                    '
+                    onmouseover="this.style.transform='scale(1.03)'"
+                    onmouseout="this.style.transform='scale(1)'"
                     onclick="copyToClipboard('{hex_code}', '{hex_id}')"
                     title="Klik untuk menyalin kode Hex"
                 >
-                    <span id="{hex_id}" style="margin-bottom: 5px;">{hex_code}</span>
-                    <span id="{rgb_id}" style="font-size: 0.8em; font-weight: normal;" 
+                    <span id="{hex_id}" style='margin-bottom: 5px;'>{hex_code}</span>
+                    <span id="{rgb_id}" style='font-size: 0.8em; font-weight: normal;' 
                           onclick="event.stopPropagation(); copyToClipboard('{rgb_code}', '{rgb_id}');"
                           title="Klik untuk menyalin kode RGB"
                     >{rgb_code}</span>
@@ -134,4 +134,4 @@ if uploaded_file is not None:
             )
 
     st.markdown("---")
-    st.write("Dibuat dengan ❤️ dan Streamlit.")
+    st.write("Dibuat oleh Fizi .")
