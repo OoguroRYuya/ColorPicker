@@ -16,7 +16,6 @@ def get_dominant_colors(image, num_colors=5):
         list: Daftar warna dominan dalam format RGB.
     """
     # Mengubah ukuran gambar untuk mempercepat pemrosesan
-    # (Opsional, tergantung ukuran gambar)
     image_resized = cv2.resize(image, (150, 150), interpolation=cv2.INTER_AREA)
     
     # Mengubah gambar dari BGR ke RGB (karena Streamlit dan K-Means lebih umum dengan RGB)
@@ -26,7 +25,7 @@ def get_dominant_colors(image, num_colors=5):
     pixels = image_rgb.reshape(-1, 3)
 
     # Terapkan K-Means clustering
-    kmeans = KMeans(n_clusters=num_colors, random_state=0, n_init=10)
+    kmeans = KMeans(n_clusters=num_colors, random_state=0, n_init=10) # n_init=10 disarankan untuk K-Means
     kmeans.fit(pixels)
 
     # Dapatkan pusat cluster (warna dominan)
@@ -49,7 +48,7 @@ st.set_page_config(
 )
 
 st.title("🎨 Color Picker dari Gambar")
-st.markdown("Unggah sebuah gambar dan kami akan mengekstrak 5 warna paling dominan untuk Anda!")
+st.markdown("Unggah sebuah gambar dan kami akan mengekstrak 5 warna paling dominan untuk Anda! **Klik pada kotak warna untuk menyalin kodenya.**")
 
 uploaded_file = st.file_uploader("Pilih sebuah gambar...", type=["jpg", "jpeg", "png", "webp"])
 
@@ -66,32 +65,61 @@ if uploaded_file is not None:
 
     st.subheader("Palet Warna Dominan:")
     
+    # JavaScript untuk menyalin ke clipboard
+    # Fungsi ini akan ditambahkan ke body HTML
+    st.markdown("""
+        <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Opsional: Tampilkan notifikasi kecil
+                // alert('Copied to clipboard: ' + text);
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+        </script>
+    """, unsafe_allow_html=True)
+
     # Buat container untuk palet warna
     col1, col2, col3, col4, col5 = st.columns(5)
     cols = [col1, col2, col3, col4, col5]
 
     for i, color_rgb in enumerate(dominant_colors):
         hex_code = rgb_to_hex(color_rgb)
+        rgb_code = f"RGB({color_rgb[0]}, {color_rgb[1]}, {color_rgb[2]})"
         
         with cols[i]:
+            # Menggunakan onclick event pada div untuk memanggil fungsi JavaScript
+            # Pastikan teks yang disalin adalah kode Hex, karena itu yang paling umum.
             st.markdown(
                 f"""
-                <div style="
-                    width: 100%;
-                    height: 100px;
-                    background-color: {hex_code};
-                    border-radius: 10px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-                ">
+                <div 
+                    style="
+                        width: 100%;
+                        height: 100px;
+                        background-color: {hex_code};
+                        border-radius: 10px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+                        cursor: pointer; /* Menambahkan pointer agar terlihat bisa diklik */
+                    "
+                    onclick="copyToClipboard('{hex_code}')" 
+                    title="Klik untuk menyalin kode Hex"
+                >
                 </div>
-                <p style="text-align: center; font-weight: bold; margin-top: 10px;">{hex_code}</p>
-                <p style="text-align: center; font-size: 0.9em;">RGB({color_rgb[0]}, {color_rgb[1]}, {color_rgb[2]})</p>
+                <p style="text-align: center; font-weight: bold; margin-top: 10px; cursor: pointer;" 
+                   onclick="copyToClipboard('{hex_code}')"
+                   title="Klik untuk menyalin kode Hex"
+                >{hex_code}</p>
+                <p style="text-align: center; font-size: 0.9em; cursor: pointer;" 
+                   onclick="copyToClipboard('{rgb_code}')"
+                   title="Klik untuk menyalin kode RGB"
+                >{rgb_code}</p>
                 """, 
                 unsafe_allow_html=True
             )
 
     st.markdown("---")
-    st.write("Dibuat dengan ❤️ dan Streamlit.")
+    st.write("Dibuat dengan Fizi.")
