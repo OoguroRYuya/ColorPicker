@@ -94,7 +94,7 @@ if uploaded_file is not None:
             st.markdown(
                 f"""
                 <div 
-                    style="
+                    style='
                         width: 100%;
                         height: 100px;
                         background-color: {hex_code};
@@ -104,16 +104,16 @@ if uploaded_file is not None:
                         align-items: center;
                         box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
                         cursor: pointer; /* Menambahkan pointer agar terlihat bisa diklik */
-                    "
+                    '
                     onclick="copyToClipboard('{hex_code}')" 
                     title="Klik untuk menyalin kode Hex"
                 >
                 </div>
-                <p style="text-align: center; font-weight: bold; margin-top: 10px; cursor: pointer;" 
+                <p style='text-align: center; font-weight: bold; margin-top: 10px; cursor: pointer;' 
                    onclick="copyToClipboard('{hex_code}')"
                    title="Klik untuk menyalin kode Hex"
                 >{hex_code}</p>
-                <p style="text-align: center; font-size: 0.9em; cursor: pointer;" 
+                <p style='text-align: center; font-size: 0.9em; cursor: pointer;' 
                    onclick="copyToClipboard('{rgb_code}')"
                    title="Klik untuk menyalin kode RGB"
                 >{rgb_code}</p>
@@ -122,4 +122,4 @@ if uploaded_file is not None:
             )
 
     st.markdown("---")
-    st.write("Dibuat dengan Fizi.")
+    st.write("Dibuat oleh Fizi.")
